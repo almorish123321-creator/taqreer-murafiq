@@ -4,7 +4,7 @@ process.env.NTBA_FIX_319 = 1;
 const TelegramBot = require('node-telegram-bot-api');
 const path = require('path');
 const fs = require('fs').promises;
-const puppeteer = require('puppeteer');
+const crypto = require('crypto');
 
 // Configuration
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8141096775:AAH0y68mtJ8-rDi_GVI0XR9oP0WHTxQIEM4';
