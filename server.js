@@ -7,7 +7,7 @@ const fs = require('fs').promises;
 const crypto = require('crypto');
 
 // Configuration
-const TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8141096775:AAH0y68mtJ8-rDi_GVI0XR9oP0WHTxQIEM4';
+const TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8747259082:AAEOGk2J3Rc_-ry7HHH2nTthvJR_ysJNaQk';
 const PORT = process.env.PORT || 3000;
 const WEB_APP_URL = process.env.RENDER_EXTERNAL_URL || process.env.WEB_APP_URL || 'https://seha-sickleave.onrender.com';
 const WEB_APP_URL_CACHED = WEB_APP_URL + '?v=7';
