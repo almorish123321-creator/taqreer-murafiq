@@ -3,7 +3,8 @@ database.sqlite
 *.log
 .cache/
 .env
-.subscriptions.json
+subscriptions.json
+data/
 __pycache__/
 *.pyc
 *.session

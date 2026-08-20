@@ -28,8 +28,12 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.static(__dirname));
 
-// Local database path
-const subscriptionsPath = path.join(__dirname, 'subscriptions.json');
+// Local database path - use /data on Render for persistence
+const dataDir = process.env.DATA_DIR || path.join(__dirname, 'data');
+if (!require('fs').existsSync(dataDir)) {
+    require('fs').mkdirSync(dataDir, { recursive: true });
+}
+const subscriptionsPath = path.join(dataDir, 'subscriptions.json');
 
 // Helper to compute remaining subscription days
 const getDaysRemaining = (expiresAt) => {

@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: taqreer-murafiq
+    repo: https://github.com/almorish123321-creator/taqreer-murafiq.git
+    branch: main
+    plan: free
+    region: oregon
+    runtime: node
+    buildCommand: npm ci --no-audit --no-fund
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: yes
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: WEB_APP_URL
+        value: https://taqreer-murafiq.onrender.com
+      - key: RENDER_EXTERNAL_URL
+        value: https://taqreer-murafiq.onrender.com
+      - key: ADMIN_USERNAME
+        sync: false
