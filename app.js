@@ -776,6 +776,22 @@ else document.body.removeAttribute('dir');
     
 
 
+            // ===== SAVE PDF TO STATE FOR DOWNLOAD LATER =====
+            app.state.lastPdfBase64 = pdfBase64;
+            app.state.lastReportId = reportId;
+
+            // ===== AUTO-DOWNLOAD PDF TO DEVICE =====
+            try {
+                const link = document.createElement('a');
+                link.href = pdfBase64;
+                link.download = `${reportId}.pdf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (dlErr) {
+                console.warn('Auto-download failed:', dlErr);
+            }
+
             // Send generated PDF back to server to send via Telegram
             const sendResponse = await fetch('/api/send-generated-pdf', {
                 method: 'POST',
@@ -790,7 +806,7 @@ else document.body.removeAttribute('dir');
             
             const sendResult = await sendResponse.json();
             if (!sendResult.success) {
-                throw new Error(sendResult.error || 'Failed to send PDF');
+                console.warn('Telegram send failed:', sendResult.error);
             }
 
             // Also save report data
@@ -832,20 +848,57 @@ else document.body.removeAttribute('dir');
             });
 
             document.getElementById('loading-overlay').style.display = 'none';
-
-            if(response.ok) {
-                document.getElementById('report-form').reset();
-                app.navigate('success');
-            } else {
-                const errResult = await response.json().catch(() => ({}));
-                alert("❌ حدث خطأ أثناء الإرسال: " + (errResult.error || response.status));
-                fetch('/api/logs?msg=Server_Error_' + response.status);
-            }
+            document.getElementById('report-form').reset();
+            app.navigate('success');
         } catch(e) {
             console.error("PDF Generation error: ", e);
             fetch('/api/logs?msg=' + encodeURIComponent('Client_Error: ' + e.message));
             alert("حدث خطأ أثناء إصدار التقرير: " + e.message);
             document.getElementById('loading-overlay').style.display = 'none';
+        }
+    },
+
+    downloadLastPdf() {
+        if (!app.state.lastPdfBase64) {
+            if(this.tg) this.tg.showAlert('لا يوجد تقرير للتحميل');
+            else alert('لا يوجد تقرير للتحميل');
+            return;
+        }
+        try {
+            const link = document.createElement('a');
+            link.href = app.state.lastPdfBase64;
+            link.download = `${app.state.lastReportId || 'report'}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch(e) {
+            if(this.tg) this.tg.showAlert('حدث خطأ أثناء التحميل');
+            else alert('حدث خطأ أثناء التحميل');
+        }
+    },
+
+    printLastPdf() {
+        if (!app.state.lastPdfBase64) {
+            if(this.tg) this.tg.showAlert('لا يوجد تقرير للطباعة');
+            else alert('لا يوجد تقرير للطباعة');
+            return;
+        }
+        try {
+            const printWindow = window.open('', '_blank');
+            if (printWindow) {
+                printWindow.document.write(`
+                    <html><head><title>طباعة التقرير</title></head>
+                    <body style="margin:0;padding:0;">
+                    <iframe src="${app.state.lastPdfBase64}" style="width:100%;height:100%;border:none;" onload="this.contentWindow.print();"></iframe>
+                    </body></html>
+                `);
+                printWindow.document.close();
+            } else {
+                // Fallback: download instead
+                this.downloadLastPdf();
+            }
+        } catch(e) {
+            this.downloadLastPdf();
         }
     },
 

@@ -340,9 +340,15 @@
                 <h1 style="color: #112233; font-size: 26px; font-weight: bold; margin-bottom: 12px; font-family: 'Tajawal', sans-serif;">تم بنجاح!</h1>
                 <p style="color: #556677; font-size: 15px; margin-bottom: 40px; font-family: 'Tajawal', sans-serif;">تم إصدار التقرير وإرساله إليك في المحادثة.</p>
                 
-                <div style="display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 15px; padding: 0 10px;">
-                    <button style="flex: 1; padding: 14px; background: none; border: none; color: #789; font-family: 'Tajawal', sans-serif; font-weight: bold; font-size: 15px; text-align: center; cursor: pointer;" onclick="app.navigate('dashboard')">العودة للرئيسية</button>
-                    <button style="flex: 1; padding: 14px; border-radius: 10px; background: #00a896; border: none; color: white; font-family: 'Tajawal', sans-serif; font-weight: bold; font-size: 15px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1);" onclick="app.closeApp()">إغلاق التطبيق</button>
+                <div style="display: flex; flex-direction: column; width: 100%; justify-content: center; align-items: center; gap: 12px; padding: 0 10px;">
+                    <div style="display: flex; width: 100%; gap: 12px;">
+                        <button style="flex: 1; padding: 14px; border-radius: 10px; background: #00a896; border: none; color: white; font-family: 'Tajawal', sans-serif; font-weight: bold; font-size: 15px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1);" onclick="app.downloadLastPdf()">&#x062A;&#x062D;&#x0645;&#x064A;&#x0644; &#x0627;&#x0644;&#x062A;&#x0642;&#x0631;&#x064A;&#x0631; &#x1F4C4;</button>
+                        <button style="flex: 1; padding: 14px; border-radius: 10px; background: #216ba5; border: none; color: white; font-family: 'Tajawal', sans-serif; font-weight: bold; font-size: 15px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1);" onclick="app.printLastPdf()">&#x0637;&#x0628;&#x0627;&#x0639;&#x0629; &#x0627;&#x0644;&#x062A;&#x0642;&#x0631;&#x064A;&#x0631; &#x1F5A8;&#xFE0F;</button>
+                    </div>
+                    <div style="display: flex; width: 100%; gap: 12px;">
+                        <button style="flex: 1; padding: 14px; background: none; border: none; color: #789; font-family: 'Tajawal', sans-serif; font-weight: bold; font-size: 15px; text-align: center; cursor: pointer;" onclick="app.navigate('dashboard')">العودة للرئيسية</button>
+                        <button style="flex: 1; padding: 14px; border-radius: 10px; background: #e74c3c; border: none; color: white; font-family: 'Tajawal', sans-serif; font-weight: bold; font-size: 15px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1);" onclick="app.closeApp()">إغلاق التطبيق</button>
+                    </div>
                 </div>
             </main>
         </section>
