@@ -7,13 +7,19 @@ const fs = require('fs').promises;
 const crypto = require('crypto');
 
 // Configuration
-const TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8747259082:AAEOGk2J3Rc_-ry7HHH2nTthvJR_ysJNaQk';
+if (!process.env.TELEGRAM_BOT_TOKEN) {
+    throw new Error('TELEGRAM_BOT_TOKEN is required');
+}
+const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const PORT = process.env.PORT || 3000;
-const WEB_APP_URL = process.env.RENDER_EXTERNAL_URL || process.env.WEB_APP_URL || 'https://seha-sickleave.onrender.com';
-const WEB_APP_URL_CACHED = WEB_APP_URL + '?v=7';
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'zakmmm_1211';
+const WEB_APP_URL = process.env.RENDER_EXTERNAL_URL || process.env.WEB_APP_URL;
+if (!WEB_APP_URL) {
+    throw new Error('WEB_APP_URL or RENDER_EXTERNAL_URL is required');
+}
+const WEB_APP_URL_CACHED = WEB_APP_URL + '?v=8';
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const OWNER_CONTACT = `https://t.me/${ADMIN_USERNAME}`;
-const CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID || '-1002184109677';
+const CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID || '';
 
 const app = express();
 
@@ -760,7 +766,7 @@ function addLog(msg) {
 app.post('/api/send-pdf', async (req, res) => {
     try {
         const { chatId, pdfBase64, filename, reportId } = req.body;
-        addLog(`send-pdf called for chatId: ${chatId}, pdf length: ${pdfBase64 ? pdfBase64.length : 0}`);
+        addLog(`send-pdf called for chatId: ${chatId}`);
         
         if (!chatId || !pdfBase64) {
             addLog('Missing chatId or pdfBase64');
@@ -1126,8 +1132,13 @@ app.get('/api/verify', async (req, res) => {
 });
 
 // Ensure SPA routes always return index.html instead of Not Found
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 app.get('*', (req, res) => {
-    if (req.path.startsWith('/api') || req.path.startsWith(`/webhook/${TOKEN}`)) {
+    if (req.path.startsWith('/api') || req.path.startsWith('/webhook/')) {
         return res.status(404).json({ success: false, error: 'Route not found' });
     }
     res.sendFile(path.join(__dirname, 'index.html'));
@@ -1200,11 +1211,11 @@ const startServer = async () => {
 
         // Configure Webhook if in Production (Render)
         if (isProduction) {
-            const webhookUrl = `${WEB_APP_URL}/webhook/${TOKEN}`;
+            const webhookUrl = `${WEB_APP_URL}/webhook/telegram`;
             await bot.setWebHook(webhookUrl);
-            console.log(`✓ Webhook set to: ${webhookUrl}`);
+            console.log('Webhook configured successfully');
             
-            app.post(`/webhook/${TOKEN}`, (req, res) => {
+            app.post('/webhook/telegram', (req, res) => {
                 bot.processUpdate(req.body);
                 res.sendStatus(200);
             });
@@ -1213,12 +1224,9 @@ const startServer = async () => {
         // Configure Open button with the correct Render URL
         await configureChatMenuButton();
 
-        app.listen(PORT, () => {
-            console.log(`\n=== SEHA Sick Leave App ===`);
-            console.log(`✓ Server running at http://localhost:${PORT}`);
-            console.log(`✓ WEB_APP_URL = ${WEB_APP_URL}`);
-            console.log(`✓ Bot mode: ${isProduction ? 'Webhook (Production/Render)' : 'Polling (Local)'}`);
-            console.log(`✓ Database: Local subscriptions.json\n`);
+        app.listen(PORT, '0.0.0.0', () => {
+            console.log(`Server running on port ${PORT}`);
+            console.log(`Bot mode: ${isProduction ? 'Webhook' : 'Polling'}`);
         });
     } catch (err) {
         console.error('Failed to start server:', err);
@@ -1231,12 +1239,11 @@ app.get('/setup', async (req, res) => {
     try {
         await configureChatMenuButton();
         if (isProduction) {
-            const webhookUrl = `${WEB_APP_URL}/webhook/${TOKEN}`;
+            const webhookUrl = `${WEB_APP_URL}/webhook/telegram`;
             await bot.setWebHook(webhookUrl);
             res.json({
                 success: true,
-                message: `Webhook and Menu Button configured successfully`,
-                webhookUrl,
+                message: 'Webhook and Menu Button configured successfully',
                 webAppUrl: WEB_APP_URL_CACHED
             });
         } else {
