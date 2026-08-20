@@ -3,7 +3,10 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
 const MONGODB_URI = process.env.MONGODB_URI;
-const dbPath = path.resolve(__dirname, 'database.sqlite');
+const fs = require('fs');
+const dataDir = process.env.DATA_DIR || '/data';
+if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+const dbPath = path.join(dataDir, 'database.sqlite');
 
 let client;
 let db;
